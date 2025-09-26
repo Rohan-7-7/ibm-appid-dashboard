@@ -24,7 +24,7 @@ View interactive charts, tables, and live activity feeds.
 ✅ Settings for profile & security
 
 ## 🌐 Live Demo
-🚀 🚀 **[View Live Project](https://Rohan-7-7.github.io/your-repo-name/IBM_project.html)**
+🚀 🚀 **[View Live Project](https://Rohan-7-7.github.io/ibm-appid-dashboard/IBM_project.html)**
 ### 📑 Report Highlights
 - Why authentication services are important for web apps  
 - Challenges without secure authentication  
