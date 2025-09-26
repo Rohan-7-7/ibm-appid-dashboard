@@ -23,6 +23,21 @@ View interactive charts, tables, and live activity feeds.
 ✅ Report generation (user, sales, system)
 ✅ Settings for profile & security
 
+## 📄 Project Report
+For a detailed explanation of this project, check out the PDF report:  
+
+👉 [IBM Project Report – Secure User Authentication (PDF)](IBM%20Project%20APP%20ID.pdf)
+
+### 📑 Report Highlights
+- Why authentication services are important for web apps  
+- Challenges without secure authentication  
+- Project objectives  
+- Step-by-step authentication flow  
+- Tools used (IBM Cloud, App ID, Web App Framework)  
+- Conclusion: Enterprise-grade security with IBM App ID  
+
+
+
 ## 🛠️ Tools & Technologies Used
 
 Frontend: HTML5, CSS3, JavaScript
