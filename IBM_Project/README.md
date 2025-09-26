@@ -37,7 +37,7 @@ For a detailed explanation of this project, check out the PDF report:
 - Conclusion: Enterprise-grade security with IBM App ID
 
    ## 🌐 Live Demo
-🚀 🚀 **[View Live Project](https://Rohan-7-7/your-repo-name/IBM_project.html)**
+🚀  🚀 **[View Live Project](https://rohan-7-7.github.io/ibm-appid-dashboard/IBM_project.html)**
 
 
 ## 🛠️ Tools & Technologies Used
