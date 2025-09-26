@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Secured by IBM App ID</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+        }
+
+        
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-box h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .login-btn {
+            background: #1155AE;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .login-btn:hover {
+            background: #0d4299;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(17, 85, 174, 0.3);
+        }
+
+        
+        .dashboard {
+            display: none;
+        }
+
+        .header {
+            background: white;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1155AE;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1155AE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #e7f3ff;
+            border-left-color: #1155AE;
+            color: #1155AE;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Page Content Sections */
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1155AE;
+            margin-bottom: 5px;
+        }
+
+        .card .label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .card .trend {
+            margin-top: 10px;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .trend.up {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .trend.down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #1976d2;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-placeholder:hover {
+            background: linear-gradient(135deg, #bbdefb, #90caf9);
+            transform: scale(1.02);
+        }
+
+        /* Users Table */
+        .users-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .table-header {
+            background: #1155AE;
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-user-btn {
+            background: white;
+            color: #1155AE;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-user-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px 25px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            margin: 0 2px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #e9ecef;
+        }
+
+        /* Settings Form */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .settings-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #1155AE;
+        }
+
+        .save-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e3e3e3;
+            border-top: 5px solid #1155AE;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .welcome-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #155724;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.info {
+            background: #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container" style="display: none;">
+        <div class="login-box">
+            <h1>🏢 Company Dashboard</h1>
+            <p>Please authenticate with your corporate account to access the dashboard</p>
+            <button class="login-btn" onclick="login()">
+                🔐 Login with IBM App ID
+            </button>
+            <div style="margin-top: 20px; font-size: 12px; color: #999;">
+                Secure authentication powered by IBM Cloud
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboardScreen" class="dashboard">
+        <header class="header">
+            <div class="logo">📊 Dashboard</div>
+            <div class="user-info">
+                <span id="userName">Loading...</span>
+                <div class="user-avatar" id="userAvatar">U</div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="nav-item active" data-page="overview">📊 Overview</div>
+                <div class="nav-item" data-page="analytics">📈 Analytics</div>
+                <div class="nav-item" data-page="users">👥 Users</div>
+                <div class="nav-item" data-page="settings">⚙️ Settings</div>
+                <div class="nav-item" data-page="reports">📋 Reports</div>
+            </aside>
+
+            <main class="content-area">
+                <div class="welcome-message" id="welcomeMessage" style="display: none;">
+                    <strong>Welcome back!</strong> You have successfully authenticated with IBM App ID.
+                    <button class="close-btn" onclick="closeWelcome()">&times;</button>
+                </div>
+
+                <!-- Overview Page -->
+                <div id="overviewPage" class="page-content active">
+                    <div class="page-header">
+                        <h1>Dashboard Overview</h1>
+                        <p>Your business metrics at a glance</p>
+                    </div>
+
+                    <div class="dashboard-cards">
+                        <div class="card" onclick="animateCard(this)">
+                            <h3>Total Users</h3>
+                            <div class="value" id="totalUsersCount">2,543</div>
+                            <div class="label">Active this month</div>
+                            <div class="trend up">↗ +12.5%</div>
+                        </div>
+                        
+                        <div class="card" onclick="animateCard(this)">
+                            <h3>Revenue</h3>
+                            <div class="value" id="revenueCount">$45,210</div>
+                            <div class="label">This quarter</div>
+                            <div class="trend up">↗ +8.3%</div>
+                        </div>
+                        
+                        <div class="card" onclick="animateCard(this)">
+                            <h3>Orders</h3>
+                            <div class="value" id="ordersCount">1,284</div>
+                            <div class="label">Completed today</div>
+                            <div class="trend up">↗ +15.2%</div>
+                        </div>
+                        
+                        <div class="card" onclick="animateCard(this)">
+                            <h3>Performance</h3>
+                            <div class="value" id="performanceCount">98.5%</div>
+                            <div class="label">System uptime</div>
+                            <div class="trend up">↗ +0.2%</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3 style="margin-bottom: 20px; color: #333;">Analytics Overview</h3>
+                        <div class="chart-placeholder" onclick="loadChart()" id="overviewChart">
+                            <canvas id="overviewCanvas" width="400" height="300" style="display: none;"></canvas>
+                            <div id="chartLoadPrompt">
+                                📊 Click to load interactive analytics chart<br>
+                                <small>Real-time data visualization</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analyticsPage" class="page-content">
+                    <div class="page-header">
+                        <h1>Advanced Analytics</h1>
+                        <p>Detailed insights and performance metrics</p>
+                    </div>
+
+                    <div class="dashboard-cards">
+                        <div class="card">
+                            <h3>Page Views</h3>
+                            <div class="value">45,692</div>
+                            <div class="label">Last 30 days</div>
+                            <div class="trend up">↗ +23.1%</div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>Conversion Rate</h3>
+                            <div class="value">3.2%</div>
+                            <div class="label">Monthly average</div>
+                            <div class="trend down">↘ -0.8%</div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>Bounce Rate</h3>
+                            <div class="value">42.1%</div>
+                            <div class="label">Session average</div>
+                            <div class="trend down">↘ -2.3%</div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>Avg. Session</h3>
+                            <div class="value">4:32</div>
+                            <div class="label">Duration in minutes</div>
+                            <div class="trend up">↗ +18.5%</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3 style="margin-bottom: 20px;">Traffic Sources</h3>
+                        <div class="chart-placeholder">
+                            <canvas id="analyticsCanvas" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Page -->
+                <div id="usersPage" class="page-content">
+                    <div class="page-header">
+                        <h1>User Management</h1>
+                        <p>Real-time user activity and authentication logs</p>
+                    </div>
+
+                    <!-- Real-time Activity Cards -->
+                    <div class="dashboard-cards" style="margin-bottom: 30px;">
+                        <div class="card">
+                            <h3>Online Now</h3>
+                            <div class="value" id="onlineUsersCount">3</div>
+                            <div class="label">Currently active users</div>
+                            <div class="trend up">🟢 Live</div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>Recent Logins</h3>
+                            <div class="value" id="recentLoginsCount">12</div>
+                            <div class="label">Last 24 hours</div>
+                            <div class="trend up">↗ +4 today</div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>New Registrations</h3>
+                            <div class="value" id="newRegistrationsCount">5</div>
+                            <div class="label">This week</div>
+                            <div class="trend up">↗ +2 new</div>
+                        </div>
+
+                        <div class="card">
+                            <h3>Authentication Rate</h3>
+                            <div class="value" id="authSuccessRate">98.7%</div>
+                            <div class="label">Success rate today</div>
+                            <div class="trend up">↗ +0.3%</div>
+                        </div>
+                    </div>
+
+                    <!-- Real-time Activity Feed -->
+                    <div class="users-table" style="margin-bottom: 30px;">
+                        <div class="table-header">
+                            <h3>🔴 Live Activity Feed</h3>
+                            <button class="add-user-btn" onclick="toggleLiveUpdates()" id="liveToggle">⏸️ Pause Live</button>
+                        </div>
+                        <div style="max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 15px;">
+                            <div id="activityFeed">
+                                <!-- Live activity will appear here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- All Users Table -->
+                    <div class="users-table">
+                        <div class="table-header">
+                            <h3>All Registered Users</h3>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="add-user-btn" onclick="refreshUserData()" title="Refresh user data">🔄 Refresh</button>
+                                <button class="add-user-btn" onclick="addUser()">+ Add User</button>
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>👤 Name</th>
+                                    <th>📧 Email</th>
+                                    <th>🔐 Auth Method</th>
+                                    <th>📊 Status</th>
+                                    <th>⏰ Last Login</th>
+                                    <th>📍 Location</th>
+                                    <th>🔧 Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Current user (you) -->
+                                <tr class="current-user" style="background: #e7f3ff;">
+                                    <td><strong id="currentUserName">John Doe</strong> <span style="color: #28a745; font-size: 12px;">👤 (You)</span></td>
+                                    <td><span id="currentUserEmail">john.doe@company.com</span></td>
+                                    <td>IBM App ID</td>
+                                    <td><span class="status active">🟢 Online</span></td>
+                                    <td><span id="currentLoginTime">Just now</span></td>
+                                    <td>🌍 Germany</td>
+                                    <td>
+                                        <button class="action-btn" onclick="editUser('current')" title="Edit Profile">✏️</button>
+                                    </td>
+                                </tr>
+                                <!-- Other users -->
+                                <tr>
+                                    <td>Jane Smith</td>
+                                    <td>jane.smith@company.com</td>
+                                    <td>Google SSO</td>
+                                    <td><span class="status active">🟢 Online</span></td>
+                                    <td><span class="live-time" data-time="300">5 minutes ago</span></td>
+                                    <td>🇺🇸 USA</td>
+                                    <td>
+                                        <button class="action-btn" onclick="editUser('jane.smith@company.com')" title="Edit">✏️</button>
+                                        <button class="action-btn" onclick="deleteUser('jane.smith@company.com')" title="Delete">🗑️</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Mike Johnson</td>
+                                    <td>mike.johnson@company.com</td>
+                                    <td>Facebook</td>
+                                    <td><span class="status active">🟡 Away</span></td>
+                                    <td><span class="live-time" data-time="1800">30 minutes ago</span></td>
+                                    <td>🇬🇧 UK</td>
+                                    <td>
+                                        <button class="action-btn" onclick="editUser('mike.johnson@company.com')" title="Edit">✏️</button>
+                                        <button class="action-btn" onclick="deleteUser('mike.johnson@company.com')" title="Delete">🗑️</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Sarah Wilson</td>
+                                    <td>sarah.wilson@company.com</td>
+                                    <td>IBM App ID</td>
+                                    <td><span class="status inactive">⚫ Offline</span></td>
+                                    <td><span class="live-time" data-time="7200">2 hours ago</span></td>
+                                    <td>🇨🇦 Canada</td>
+                                    <td>
+                                        <button class="action-btn" onclick="editUser('sarah.wilson@company.com')" title="Edit">✏️</button>
+                                        <button class="action-btn" onclick="deleteUser('sarah.wilson@company.com')" title="Delete">🗑️</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Alex Chen</td>
+                                    <td>alex.chen@company.com</td>
+                                    <td>GitHub</td>
+                                    <td><span class="status active">🟢 Online</span></td>
+                                    <td><span class="live-time" data-time="120">2 minutes ago</span></td>
+                                    <td>🇯🇵 Japan</td>
+                                    <td>
+                                        <button class="action-btn" onclick="editUser('alex.chen@company.com')" title="Edit">✏️</button>
+                                        <button class="action-btn" onclick="deleteUser('alex.chen@company.com')" title="Delete">🗑️</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settingsPage" class="page-content">
+                    <div class="page-header">
+                        <h1>Settings</h1>
+                        <p>Configure your dashboard preferences</p>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <h3>Profile Settings</h3>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="profileName" placeholder="Enter your full name">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" id="profileEmail" placeholder="Enter your email">
+                            </div>
+                            <div class="form-group">
+                                <label>Time Zone</label>
+                                <select id="timezone">
+                                    <option>UTC (GMT+0)</option>
+                                    <option>EST (GMT-5)</option>
+                                    <option>PST (GMT-8)</option>
+                                    <option>CET (GMT+1)</option>
+                                </select>
+                            </div>
+                            <button class="save-btn" onclick="saveProfile()">Save Profile</button>
+                        </div>
+
+                        <div class="settings-card">
+                            <h3>Security Settings</h3>
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input type="password" placeholder="Enter current password">
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" placeholder="Enter new password">
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" placeholder="Confirm new password">
+                            </div>
+                            <button class="save-btn" onclick="changePassword()">Change Password</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div id="reportsPage" class="page-content">
+                    <div class="page-header">
+                        <h1>Reports</h1>
+                        <p>Generate and download comprehensive reports</p>
+                    </div>
+
+                    <div class="dashboard-cards">
+                        <div class="card" onclick="generateReport('user')">
+                            <h3>User Report</h3>
+                            <div class="value">📊</div>
+                            <div class="label">Click to generate user activity report</div>
+                        </div>
+                        
+                        <div class="card" onclick="generateReport('sales')">
+                            <h3>Sales Report</h3>
+                            <div class="value">💰</div>
+                            <div class="label">Click to generate sales performance report</div>
+                        </div>
+                        
+                        <div class="card" onclick="generateReport('system')">
+                            <h3>System Report</h3>
+                            <div class="value">⚙️</div>
+                            <div class="label">Click to generate system health report</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        
+        const appIdConfig = {
+            tenantId: 'bb418128-a476-45a9-b8f6-11ea0af6c6c2',
+            clientId: 'f691f5c8-b438-4383-bfea-a52a0ee1da17',
+            region: 'eu-de',
+            redirectUri: window.location.origin + window.location.pathname
+        };
+
+        // Navigation functionality
+        function initializeNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all nav items
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Hide all page contents
+                    const pages = document.querySelectorAll('.page-content');
+                    pages.forEach(page => page.classList.remove('active'));
+                    
+                    // Show selected page
+                    const pageId = this.getAttribute('data-page') + 'Page';
+                    const targetPage = document.getElementById(pageId);
+                    if (targetPage) {
+                        targetPage.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Interactive Functions
+        function animateCard(card) {
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                card.style.transform = 'scale(1)';
+            }, 150);
+            
+            // Simulate data refresh
+            const value = card.querySelector('.value');
+            const originalText = value.textContent;
+            value.textContent = '...';
+            
+            setTimeout(() => {
+                value.textContent = originalText;
+                showNotification('Data refreshed successfully!', 'success');
+            }, 1000);
+        }
+
+        function loadChart() {
+            const placeholder = document.getElementById('chartLoadPrompt');
+            const canvas = document.getElementById('overviewCanvas');
+            
+            placeholder.style.display = 'none';
+            canvas.style.display = 'block';
+            
+            drawLineChart(canvas);
+            showNotification('Chart loaded successfully!', 'success');
+        }
+
+        function drawLineChart(canvas) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, '#1155AE');
+            gradient.addColorStop(1, 'rgba(17, 85, 174, 0.1)');
+            
+            const data = [45, 52, 48, 61, 55, 67, 74, 82, 69, 78, 85, 92];
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            const padding = 50;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+            
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#666';
+            
+            for (let i = 0; i < labels.length; i++) {
+                const x = padding + (i * chartWidth) / (labels.length - 1);
+                ctx.fillText(labels[i], x - 10, height - 10);
+            }
+            
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (i * chartHeight) / 5;
+                const value = Math.round(100 - (i * 20));
+                ctx.fillText(value, 10, y + 5);
+                
+                ctx.beginPath();
+                ctx.strokeStyle = '#eee';
+                ctx.lineWidth = 1;
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+            
+            ctx.beginPath();
+            ctx.strokeStyle = '#1155AE';
+            ctx.lineWidth = 3;
+            ctx.fillStyle = gradient;
+            
+            for (let i = 0; i < data.length; i++) {
+                const x = padding + (i * chartWidth) / (data.length - 1);
+                const y = padding + chartHeight - (data[i] / 100) * chartHeight;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            
+            ctx.stroke();
+            
+            ctx.lineTo(width - padding, height - padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.closePath();
+            ctx.fill();
+            
+            for (let i = 0; i < data.length; i++) {
+                const x = padding + (i * chartWidth) / (data.length - 1);
+                const y = padding + chartHeight - (data[i] / 100) * chartHeight;
+                
+                ctx.beginPath();
+                ctx.fillStyle = '#1155AE';
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.fillStyle = 'white';
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawPieChart(canvas) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 3;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const data = [
+                { label: 'Direct', value: 45, color: '#1155AE' },
+                { label: 'Google', value: 30, color: '#4285f4' },
+                { label: 'Social', value: 15, color: '#28a745' },
+                { label: 'Email', value: 10, color: '#ffc107' }
+            ];
+            
+            let currentAngle = -Math.PI / 2;
+            
+            data.forEach(segment => {
+                const sliceAngle = (segment.value / 100) * 2 * Math.PI;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = segment.color;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                const labelAngle = currentAngle + sliceAngle / 2;
+                const labelX = centerX + Math.cos(labelAngle) * (radius + 30);
+                const labelY = centerY + Math.sin(labelAngle) * (radius + 30);
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${segment.label} ${segment.value}%`, labelX, labelY);
+                
+                currentAngle += sliceAngle;
+            });
+        }
+
+        function drawBarChart(canvas) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const data = [65, 45, 80, 55, 70, 60, 85];
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const colors = ['#1155AE', '#4285f4', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8'];
+            
+            const padding = 50;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+            const barWidth = chartWidth / data.length * 0.8;
+            const barSpacing = chartWidth / data.length * 0.2;
+            
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#666';
+            
+            for (let i = 0; i < labels.length; i++) {
+                const x = padding + (i * chartWidth) / data.length + barWidth / 2;
+                ctx.textAlign = 'center';
+                ctx.fillText(labels[i], x, height - 10);
+            }
+            
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (i * chartHeight) / 5;
+                const value = Math.round(100 - (i * 20));
+                ctx.textAlign = 'left';
+                ctx.fillText(value, 10, y + 5);
+            }
+            
+            for (let i = 0; i < data.length; i++) {
+                const barHeight = (data[i] / 100) * chartHeight;
+                const x = padding + (i * chartWidth) / data.length + barSpacing / 2;
+                const y = height - padding - barHeight;
+                
+                const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight);
+                gradient.addColorStop(0, colors[i]);
+                gradient.addColorStop(1, colors[i] + '80');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                ctx.strokeStyle = colors[i];
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, barWidth, barHeight);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(data[i], x + barWidth / 2, y - 10);
+            }
+        }
+
+        function initializeAnalyticsCharts() {
+            const analyticsCanvas = document.getElementById('analyticsCanvas');
+            if (analyticsCanvas) {
+                drawPieChart(analyticsCanvas);
+            }
+        }
+
+        function refreshChart() {
+            const canvas = document.getElementById('overviewCanvas');
+            if (canvas.style.display !== 'none') {
+                drawLineChart(canvas);
+                showNotification('Chart data refreshed!', 'info');
+            }
+        }
+
+        // Real-time User Activity System
+        let liveUpdatesEnabled = true;
+        let activityInterval;
+        let timeUpdateInterval;
+
+        // Initialize real-time features
+        function initializeRealTimeFeatures() {
+            startLiveActivityFeed();
+            startTimeUpdates();
+            updateCurrentUserInfo();
+            
+            // Add current user's login activity
+            addActivityLog('login', 'You logged in successfully', 'success');
+        }
+
+        // Live Activity Feed
+        function startLiveActivityFeed() {
+            const activities = [
+                { type: 'login', user: 'jane.smith@company.com', message: 'logged in from Chrome browser' },
+                { type: 'logout', user: 'alex.chen@company.com', message: 'logged out' },
+                { type: 'register', user: 'new.user@company.com', message: 'created a new account' },
+                { type: 'update', user: 'mike.johnson@company.com', message: 'updated profile information' },
+                { type: 'login', user: 'sarah.wilson@company.com', message: 'logged in from mobile app' },
+                { type: 'password', user: 'admin@company.com', message: 'changed password' },
+                { type: 'login', user: 'test.user@company.com', message: 'logged in via Google SSO' }
+            ];
+
+            activityInterval = setInterval(() => {
+                if (liveUpdatesEnabled) {
+                    const activity = activities[Math.floor(Math.random() * activities.length)];
+                    const randomUser = activity.user;
+                    const message = activity.message;
+                    
+                    addActivityLog(activity.type, `${randomUser} ${message}`, activity.type);
+                    
+                    // Update counters randomly
+                    if (Math.random() < 0.3) {
+                        updateLiveCounters();
+                    }
+                }
+            }, Math.random() * 5000 + 2000); // Random interval between 2-7 seconds
+        }
+
+        function addActivityLog(type, message, status = 'info') {
+            const feed = document.getElementById('activityFeed');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            
+            const icons = {
+                login: '🔐',
+                logout: '🚪',
+                register: '👤',
+                update: '✏️',
+                password: '🔑',
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            
+            const colors = {
+                login: '#28a745',
+                logout: '#6c757d',
+                register: '#17a2b8',
+                update: '#ffc107',
+                password: '#dc3545',
+                success: '#28a745',
+                error: '#dc3545',
+                info: '#17a2b8'
+            };
+
+            const logEntry = document.createElement('div');
+            logEntry.style.cssText = `
+                padding: 8px 12px;
+                margin-bottom: 5px;
+                background: white;
+                border-radius: 6px;
+                border-left: 3px solid ${colors[type] || colors[status]};
+                font-size: 13px;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            
+            logEntry.innerHTML = `
+                <span style="color: ${colors[type] || colors[status]};">${icons[type] || icons[status]}</span>
+                <strong style="color: #666; font-size: 11px;">[${timeStr}]</strong>
+                <span style="margin-left: 8px;">${message}</span>
+            `;
+            
+            // Add to top of feed
+            feed.insertBefore(logEntry, feed.firstChild);
+            
+            // Keep only last 20 entries
+            while (feed.children.length > 20) {
+                feed.removeChild(feed.lastChild);
+            }
+        }
+
+        // Update live time displays
+        function startTimeUpdates() {
+            timeUpdateInterval = setInterval(() => {
+                const timeElements = document.querySelectorAll('.live-time');
+                timeElements.forEach(element => {
+                    const seconds = parseInt(element.dataset.time);
+                    const newSeconds = seconds + 60; // Add 1 minute
+                    element.dataset.time = newSeconds;
+                    
+                    // Update display
+                    if (newSeconds < 60) {
+                        element.textContent = 'Just now';
+                    } else if (newSeconds < 3600) {
+                        const minutes = Math.floor(newSeconds / 60);
+                        element.textContent = `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                    } else if (newSeconds < 86400) {
+                        const hours = Math.floor(newSeconds / 3600);
+                        element.textContent = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                    } else {
+                        const days = Math.floor(newSeconds / 86400);
+                        element.textContent = `${days} day${days > 1 ? 's' : ''} ago`;
+                    }
+                });
+                
+                // Update current user login time
+                const currentLoginTime = document.getElementById('currentLoginTime');
+                if (currentLoginTime) {
+                    const loginTime = new Date(sessionStorage.getItem('loginTime') || Date.now());
+                    const now = new Date();
+                    const diffMinutes = Math.floor((now - loginTime) / 60000);
+                    
+                    if (diffMinutes < 1) {
+                        currentLoginTime.textContent = 'Just now';
+                    } else if (diffMinutes < 60) {
+                        currentLoginTime.textContent = `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
+                    } else {
+                        const hours = Math.floor(diffMinutes / 60);
+                        currentLoginTime.textContent = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                    }
+                }
+            }, 60000); // Update every minute
+        }
+
+        // Update live counters
+        function updateLiveCounters() {
+            const counters = [
+                { id: 'onlineUsersCount', base: 3, variance: 2 },
+                { id: 'recentLoginsCount', base: 12, variance: 3 },
+                { id: 'newRegistrationsCount', base: 5, variance: 1 },
+                { id: 'authSuccessRate', base: 98.7, variance: 0.3, suffix: '%' }
+            ];
+            
+            counters.forEach(counter => {
+                const element = document.getElementById(counter.id);
+                if (element) {
+                    const change = (Math.random() - 0.5) * counter.variance;
+                    let newValue = counter.base + change;
+                    
+                    if (counter.suffix === '%') {
+                        newValue = Math.max(95, Math.min(100, newValue)).toFixed(1) + '%';
+                    } else {
+                        newValue = Math.round(Math.max(0, newValue));
+                    }
+                    
+                    element.textContent = newValue;
+                }
+            });
+        }
+
+        // Update current user information
+        function updateCurrentUserInfo() {
+            const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+            if (userData.name) {
+                document.getElementById('currentUserName').textContent = userData.name;
+                document.getElementById('currentUserEmail').textContent = userData.email || 'user@example.com';
+            }
+            
+            // Store login time
+            if (!sessionStorage.getItem('loginTime')) {
+                sessionStorage.setItem('loginTime', Date.now());
+            }
+        }
+
+        // Toggle live updates
+        function toggleLiveUpdates() {
+            liveUpdatesEnabled = !liveUpdatesEnabled;
+            const button = document.getElementById('liveToggle');
+            
+            if (liveUpdatesEnabled) {
+                button.innerHTML = '⏸️ Pause Live';
+                button.style.background = '#dc3545';
+                addActivityLog('info', 'Live updates resumed', 'success');
+            } else {
+                button.innerHTML = '▶️ Resume Live';
+                button.style.background = '#28a745';
+                addActivityLog('info', 'Live updates paused', 'info');
+            }
+        }
+
+        // Refresh user data
+        function refreshUserData() {
+            showNotification('Refreshing user data...', 'info');
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Update all live times randomly
+                const timeElements = document.querySelectorAll('.live-time');
+                timeElements.forEach(element => {
+                    const randomTime = Math.floor(Math.random() * 7200); // 0-2 hours
+                    element.dataset.time = randomTime;
+                });
+                
+                // Update counters
+                updateLiveCounters();
+                
+                // Add refresh activity
+                addActivityLog('update', 'User data refreshed by admin', 'success');
+                showNotification('User data refreshed successfully!', 'success');
+            }, 2000);
+        }
+
+        // Enhanced user management functions
+        function addUser() {
+            const name = prompt('Enter user name:');
+            const email = prompt('Enter user email:');
+            const authMethod = prompt('Authentication method (IBM App ID, Google, Facebook, GitHub):') || 'IBM App ID';
+            
+            if (name && email) {
+                const tableBody = document.getElementById('usersTableBody');
+                const row = document.createElement('tr');
+                const countries = ['🇺🇸 USA', '🇬🇧 UK', '🇩🇪 Germany', '🇫🇷 France', '🇯🇵 Japan', '🇨🇦 Canada'];
+                const randomCountry = countries[Math.floor(Math.random() * countries.length)];
+                
+                row.innerHTML = `
+                    <td>${name}</td>
+                    <td>${email}</td>
+                    <td>${authMethod}</td>
+                    <td><span class="status active">🟢 Online</span></td>
+                    <td><span class="live-time" data-time="0">Just now</span></td>
+                    <td>${randomCountry}</td>
+                    <td>
+                        <button class="action-btn" onclick="editUser('${email}')" title="Edit">✏️</button>
+                        <button class="action-btn" onclick="deleteUser('${email}')" title="Delete">🗑️</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+                
+                // Update user count
+                const userCount = document.getElementById('totalUsersCount');
+                const currentCount = parseInt(userCount.textContent.replace(',', ''));
+                userCount.textContent = (currentCount + 1).toLocaleString();
+                
+                // Add activity log
+                addActivityLog('register', `New user ${name} (${email}) registered via ${authMethod}`, 'register');
+                showNotification(`User ${name} added successfully!`, 'success');
+                
+                // Update online users count
+                const onlineCount = document.getElementById('onlineUsersCount');
+                onlineCount.textContent = parseInt(onlineCount.textContent) + 1;
+            }
+        }
+
+        function editUser(email) {
+            if (email === 'current') {
+                // Edit current user - switch to settings page
+                document.querySelector('[data-page="settings"]').click();
+                showNotification('Switched to Settings to edit your profile', 'info');
+                return;
+            }
+            
+            const newName = prompt(`Edit user name for ${email}:`);
+            if (newName) {
+                addActivityLog('update', `User profile updated for ${email}`, 'update');
+                showNotification(`User ${email} updated successfully!`, 'success');
+            }
+        }
+
+        function deleteUser(email) {
+            if (confirm(`Are you sure you want to delete user ${email}?`)) {
+                // Find and remove the row
+                const rows = document.querySelectorAll('#usersTableBody tr');
+                rows.forEach(row => {
+                    const emailCell = row.cells[1];
+                    if (emailCell && emailCell.textContent === email) {
+                        row.remove();
+                    }
+                });
+                
+                // Update user count
+                const userCount = document.getElementById('totalUsersCount');
+                const currentCount = parseInt(userCount.textContent.replace(',', ''));
+                userCount.textContent = (currentCount - 1).toLocaleString();
+                
+                // Update online users count
+                const onlineCount = document.getElementById('onlineUsersCount');
+                onlineCount.textContent = Math.max(0, parseInt(onlineCount.textContent) - 1);
+                
+                // Add activity log
+                addActivityLog('logout', `User ${email} account deleted by admin`, 'error');
+                showNotification(`User ${email} deleted successfully!`, 'success');
+            }
+        }
+
+        // Settings Functions
+        function saveProfile() {
+            const name = document.getElementById('profileName').value;
+            const email = document.getElementById('profileEmail').value;
+            
+            if (name || email) {
+                if (name) {
+                    document.getElementById('userName').textContent = name;
+                    document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+                }
+                showNotification('Profile saved successfully!', 'success');
+            } else {
+                showNotification('Please fill in at least one field', 'error');
+            }
+        }
+
+        function changePassword() {
+            showNotification('Password changed successfully!', 'success');
+        }
+
+        // Reports Functions
+        function generateReport(type) {
+            showNotification(`Generating ${type} report...`, 'info');
+            
+            setTimeout(() => {
+                const reportData = {
+                    user: 'User Activity Report - 2,543 active users this month',
+                    sales: 'Sales Performance Report - $45,210 revenue this quarter',
+                    system: 'System Health Report - 98.5% uptime, all systems operational'
+                };
+                
+                showNotification(`${reportData[type]} - Download ready!`, 'success');
+                
+                // Simulate download
+                const link = document.createElement('a');
+                link.href = `data:text/plain;charset=utf-8,${encodeURIComponent(reportData[type])}`;
+                link.download = `${type}-report-${new Date().toISOString().split('T')[0]}.txt`;
+                link.click();
+            }, 3000);
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Welcome message functions
+        function closeWelcome() {
+            document.getElementById('welcomeMessage').style.display = 'none';
+        }
+
+        // Data simulation functions
+        function simulateRealTimeData() {
+            setInterval(() => {
+                // Randomly update dashboard values
+                const elements = [
+                    { id: 'totalUsersCount', base: 2543, variance: 10 },
+                    { id: 'ordersCount', base: 1284, variance: 50 },
+                    { id: 'performanceCount', base: 98.5, variance: 0.5, suffix: '%' }
+                ];
+                
+                elements.forEach(element => {
+                    const el = document.getElementById(element.id);
+                    if (el && Math.random() < 0.1) { // 10% chance to update each interval
+                        const change = (Math.random() - 0.5) * element.variance;
+                        let newValue = element.base + change;
+                        
+                        if (element.suffix === '%') {
+                            newValue = Math.max(90, Math.min(100, newValue)).toFixed(1) + '%';
+                        } else {
+                            newValue = Math.round(Math.max(0, newValue)).toLocaleString();
+                        }
+                        
+                        el.textContent = newValue;
+                    }
+                });
+            }, 5000); // Update every 5 seconds
+        }
+
+        
+        function login() {
+            const state = generateRandomString(32);
+            sessionStorage.setItem('oauth_state', state);
+
+            const authUrl = `https://${appIdConfig.region}.appid.cloud.ibm.com/oauth/v4/${appIdConfig.tenantId}/authorization`;
+            const params = new URLSearchParams({
+                client_id: appIdConfig.clientId,
+                response_type: 'code',
+                redirect_uri: appIdConfig.redirectUri,
+                scope: 'openid profile email',
+                state: state
+            });
+
+            window.location.href = `${authUrl}?${params.toString()}`;
+        }
+
+        function logout() {
+            
+            sessionStorage.clear();
+            
+            
+            showScreen('login');
+            showNotification('You have been logged out successfully', 'info');
+        }
+
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        
+        function showScreen(screen) {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboardScreen').style.display = 'none';
+
+            if (screen === 'loading') {
+                document.getElementById('loadingScreen').style.display = 'flex';
+            } else if (screen === 'login') {
+                document.getElementById('loginScreen').style.display = 'flex';
+            } else if (screen === 'dashboard') {
+                document.getElementById('dashboardScreen').style.display = 'block';
+            }
+        }
+
+        
+        function handleCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            const error = urlParams.get('error');
+
+            if (error) {
+                showNotification(`Login error: ${error}`, 'error');
+                showScreen('login');
+                return;
+            }
+
+            if (code && state) {
+                const savedState = sessionStorage.getItem('oauth_state');
+                if (state !== savedState) {
+                    showNotification('Security error: Invalid state parameter', 'error');
+                    showScreen('login');
+                    return;
+                }
+
+                
+                const mockUserData = {
+                    name: 'John Doe',
+                    email: 'john.doe@company.com',
+                    id: 'user-' + Math.random().toString(36).substr(2, 9)
+                };
+
+                
+                sessionStorage.setItem('userData', JSON.stringify(mockUserData));
+                
+                
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                
+                displayUserData(mockUserData);
+                showScreen('dashboard');
+                
+                // Initialize dashboard features
+                initializeNavigation();
+                simulateRealTimeData();
+                initializeRealTimeFeatures();
+                initializeAnalyticsCharts();
+                
+                
+                document.getElementById('welcomeMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('welcomeMessage').style.display = 'none';
+                }, 5000);
+                
+                showNotification('Welcome! Dashboard loaded successfully', 'success');
+            }
+        }
+
+        function displayUserData(userData) {
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userAvatar').textContent = userData.name.charAt(0).toUpperCase();
+            
+            // Pre-fill settings form
+            document.getElementById('profileName').value = userData.name;
+            document.getElementById('profileEmail').value = userData.email;
+        }
+
+        
+        function initializeApp() {
+            
+            const savedUserData = sessionStorage.getItem('userData');
+            
+            if (savedUserData) {
+                
+                const userData = JSON.parse(savedUserData);
+                displayUserData(userData);
+                showScreen('dashboard');
+                initializeNavigation();
+                simulateRealTimeData();
+            } else {
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('code')) {
+                    handleCallback();
+                } else {
+                    
+                    showScreen('login');
+                }
+            }
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', initializeApp);
+        
+        // Add some keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + L for logout
+            if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+                e.preventDefault();
+                logout();
+            }
+            
+            // Ctrl/Cmd + D for dashboard (overview)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                e.preventDefault();
+                document.querySelector('[data-page="overview"]').click();
+            }
+        });
+
+        // Add click-to-copy functionality for user data
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Could not copy to clipboard', 'error');
+            });
+        }
+
+        // Make email addresses clickable in user table
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailCells = document.querySelectorAll('#usersTableBody td:nth-child(2)');
+            emailCells.forEach(cell => {
+                cell.style.cursor = 'pointer';
+                cell.title = 'Click to copy email';
+                cell.addEventListener('click', () => {
+                    copyToClipboard(cell.textContent);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
